@@ -1,10 +1,17 @@
 console.log("Welcome to BlogSpace");
+
+const API_URL = "http://localhost:5000/api";
+
+// ==================== REGISTER ====================
+
 const registerForm = document.getElementById("registerForm");
 
 if (registerForm) {
-    registerForm.addEventListener("submit", function (event) {
+    registerForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
+        const name = document.getElementById("registerName").value.trim();
+        const email = document.getElementById("registerEmail").value.trim();
         const password = document.getElementById("registerPassword").value;
         const confirmPassword = document.getElementById("confirmPassword").value;
         const message = document.getElementById("registerMessage");
@@ -15,15 +22,36 @@ if (registerForm) {
             return;
         }
 
-        message.textContent = "Registration form validated successfully!";
-        message.style.color = "green";
+        try {
+            const response = await fetch(`${API_URL}/register`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ name, email, password })
+            });
+
+            const data = await response.json();
+
+            message.textContent = data.message;
+            message.style.color = response.ok ? "green" : "red";
+
+            if (response.ok) {
+                registerForm.reset();
+            }
+        } catch (error) {
+            message.textContent = "Unable to connect to the backend!";
+            message.style.color = "red";
+        }
     });
 }
+
+// ==================== CREATE BLOG ====================
 
 const createBlogForm = document.getElementById("createBlogForm");
 
 if (createBlogForm) {
-    createBlogForm.addEventListener("submit", function (event) {
+    createBlogForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
         const title = document.getElementById("blogTitle").value.trim();
@@ -37,62 +65,122 @@ if (createBlogForm) {
             return;
         }
 
-        const blog = {
-            id: Date.now(),
-            title: title,
-            category: category,
-            content: content,
-            createdAt: new Date().toLocaleDateString()
-        };
+        try {
+            const response = await fetch(`${API_URL}/blogs`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ title, category, content })
+            });
 
-        const blogs = JSON.parse(localStorage.getItem("blogs") || "[]");
-        blogs.push(blog);
+            const data = await response.json();
 
-        localStorage.setItem("blogs", JSON.stringify(blogs));
+            message.textContent = data.message;
+            message.style.color = response.ok ? "green" : "red";
 
-        message.textContent = "Blog saved successfully!";
-        message.style.color = "green";
-
-        createBlogForm.reset();
+            if (response.ok) {
+                createBlogForm.reset();
+            }
+        } catch (error) {
+            message.textContent = "Unable to connect to the backend!";
+            message.style.color = "red";
+        }
     });
 }
 
-// Display saved blogs on the dashboard
+// ==================== DISPLAY BLOGS ====================
+
 const blogList = document.getElementById("blogList");
 
 if (blogList) {
-    const blogs = JSON.parse(localStorage.getItem("blogs") || "[]");
+    async function displayBlogs() {
+        const totalBlogs = document.getElementById("totalBlogs");
 
-    const totalBlogs = document.getElementById("totalBlogs");
-    const emptyMessage = document.getElementById("emptyMessage");
+        try {
+            const response = await fetch(`${API_URL}/blogs`);
 
-    if (totalBlogs) {
-        totalBlogs.textContent = blogs.length;
+            if (!response.ok) {
+                throw new Error("Failed to fetch blogs");
+            }
+
+            const blogs = await response.json();
+
+            if (totalBlogs) {
+                totalBlogs.textContent = blogs.length;
+            }
+
+            blogList.innerHTML = "";
+
+            if (blogs.length === 0) {
+                blogList.innerHTML =
+                    "<p>No blog posts yet. Create your first blog!</p>";
+                return;
+            }
+
+            blogs.forEach(function (blog) {
+                const card = document.createElement("article");
+                card.className = "blog-card";
+
+                const title = document.createElement("h3");
+                title.textContent = blog.title;
+
+                const category = document.createElement("p");
+                category.textContent = "Category: " + blog.category;
+
+                const content = document.createElement("p");
+                content.textContent = blog.content;
+
+                card.append(title, category, content);
+                blogList.appendChild(card);
+            });
+        } catch (error) {
+            blogList.innerHTML =
+                "<p>Unable to load blogs. Please check the backend server.</p>";
+        }
     }
 
-    blogList.innerHTML = "";
+    displayBlogs();
+}
+// ==================== LOGIN API ====================
 
-    if (blogs.length === 0) {
-        blogList.innerHTML = "<p>No blog posts yet. Create your first blog!</p>";
-    } else {
-        blogs.forEach(function (blog) {
-            const card = document.createElement("article");
-            card.className = "blog-card";
+const loginForm = document.getElementById("loginForm");
 
-            const title = document.createElement("h3");
-            title.textContent = blog.title;
+if (loginForm) {
+    loginForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
 
-            const category = document.createElement("p");
-            category.textContent = "Category: " + blog.category;
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const message = document.getElementById("loginMessage");
 
-            const content = document.createElement("p");
-            content.textContent = blog.content;
+        try {
+            const response = await fetch(`${API_URL}/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email, password })
+            });
 
-            const date = document.createElement("small");
-            date.textContent = "Created: " + blog.createdAt;
+            const data = await response.json();
 
-            card.append(title, category, content, date);
-            blogList.appendChild(card);
-        });
-    }
+            message.textContent = data.message;
+            message.style.color = response.ok ? "green" : "red";
+
+            if (response.ok) {
+                localStorage.setItem(
+                    "loggedInUser",
+                    JSON.stringify(data.user)
+                );
+
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 1000);
+            }
+        } catch (error) {
+            message.textContent = "Cannot connect to backend!";
+            message.style.color = "red";
+        }
+    });
 }
