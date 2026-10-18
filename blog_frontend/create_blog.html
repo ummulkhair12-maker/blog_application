@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlogSpace | Create Blog</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <h2>BlogSpace</h2>
+
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="create_blog.html">Create Blog</a>
+                <a href="login.html">Login</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="create-container">
+        <div class="create-card">
+            <h1>Create a New Blog</h1>
+            <p>Turn your ideas into stories worth sharing.</p>
+
+            <form id="createBlogForm">
+
+                <div class="form-group">
+                    <label for="blogTitle">Blog Title</label>
+                    <input
+                        type="text"
+                        id="blogTitle"
+                        placeholder="Enter your blog title"
+                        maxlength="100"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="blogCategory">Category</label>
+                    <select id="blogCategory" required>
+                        <option value="">Select a category</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Lifestyle">Lifestyle</option>
+                        <option value="Education">Education</option>
+                        <option value="Travel">Travel</option>
+                        <option value="Food">Food</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="blogContent">Blog Content</label>
+                    <textarea
+                        id="blogContent"
+                        rows="8"
+                        placeholder="Write your story here..."
+                        required
+                    ></textarea>
+                </div>
+
+                <button type="submit" class="auth-btn">
+                    Publish Blog
+                </button>
+
+                <p id="createBlogMessage" class="form-message"></p>
+
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 BlogSpace. Built with passion.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

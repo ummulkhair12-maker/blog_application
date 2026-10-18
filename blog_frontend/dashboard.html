@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlogSpace | Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <h2>BlogSpace</h2>
+
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="create_blog.html">Create Blog</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="login.html">Login</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="dashboard-container">
+
+        <section class="dashboard-heading">
+            <div>
+                <h1>My Dashboard</h1>
+                <p>Manage your stories and explore your creativity.</p>
+            </div>
+
+            <a href="create_blog.html" class="btn">+ Create Blog</a>
+        </section>
+
+        <section class="dashboard-stats">
+            <div class="stat-card">
+                <h3 id="totalBlogs">0</h3>
+                <p>Total Blogs</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>✍️</h3>
+                <p>Keep Writing</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>🌟</h3>
+                <p>Share Your Ideas</p>
+            </div>
+        </section>
+
+        <section class="blog-section">
+            <h2>My Blog Posts</h2>
+
+            <div id="blogList" class="blog-grid">
+                <p id="emptyMessage">No blog posts yet. Create your first blog!</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 BlogSpace. Built with passion.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
