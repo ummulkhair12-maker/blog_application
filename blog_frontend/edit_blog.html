@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Blog</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="edit-blog-container">
+        <h1>Edit Blog ✏️</h1>
+
+        <form id="editBlogForm">
+            <label for="editBlogTitle">Blog Title</label>
+            <input
+                type="text"
+                id="editBlogTitle"
+                required
+            >
+
+            <label for="editBlogCategory">Category</label>
+            <input
+                type="text"
+                id="editBlogCategory"
+                required
+            >
+
+            <label for="editBlogContent">Content</label>
+            <textarea
+                id="editBlogContent"
+                rows="8"
+                required
+            ></textarea>
+
+            <button type="submit">Save Changes</button>
+
+            <p id="editBlogMessage"></p>
+        </form>
+
+        <a href="dashboard.html">← Back to Dashboard</a>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

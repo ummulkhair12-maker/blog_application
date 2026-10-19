@@ -230,6 +230,88 @@ app.post("/api/blogs", async (req, res) => {
 
 // ================= GET ALL BLOGS =================
 
+// ================= UPDATE BLOG =================
+
+app.put("/api/blogs/:id", async (req, res) => {
+    try {
+        const { title, content, category } = req.body;
+        const { id } = req.params;
+
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({
+                message: "Invalid blog ID"
+            });
+        }
+
+        if (!title || !content) {
+            return res.status(400).json({
+                message: "Title and content are required"
+            });
+        }
+
+        const blog = await Blog.findByIdAndUpdate(
+            id,
+            {
+                title: title.trim(),
+                content: content.trim(),
+                category: category || "General"
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        ).populate("author", "name");
+
+        if (!blog) {
+            return res.status(404).json({
+                message: "Blog not found"
+            });
+        }
+
+        res.json({
+            message: "Blog updated successfully",
+            blog
+        });
+    } catch (error) {
+        console.error("Update blog error:", error.message);
+
+        res.status(500).json({
+            message: "Could not update blog"
+        });
+    }
+});
+// ================= DELETE BLOG =================
+
+app.delete("/api/blogs/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({
+                message: "Invalid blog ID"
+            });
+        }
+
+        const blog = await Blog.findByIdAndDelete(id);
+
+        if (!blog) {
+            return res.status(404).json({
+                message: "Blog not found"
+            });
+        }
+
+        res.json({
+            message: "Blog deleted successfully"
+        });
+    } catch (error) {
+        console.error("Delete blog error:", error.message);
+
+        res.status(500).json({
+            message: "Could not delete blog"
+        });
+    }
+});
+
 app.get("/api/blogs", async (req, res) => {
     try {
         const blogs = await Blog.find()

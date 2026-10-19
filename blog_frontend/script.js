@@ -145,7 +145,73 @@ card.addEventListener("click", function () {
                 const content = document.createElement("p");
                 content.textContent = blog.content;
 
-                card.append(title, category, content);
+                
+                // Edit button
+const editButton = document.createElement("button");
+editButton.textContent = "Edit";
+editButton.className = "edit-button";
+
+editButton.addEventListener("click", function (event) {
+    event.stopPropagation();
+
+    window.location.href =
+        `edit_blog.html?id=${encodeURIComponent(blog._id)}`;
+});
+
+// Delete button
+const deleteButton = document.createElement("button");
+deleteButton.textContent = "Delete";
+deleteButton.className = "delete-button";
+
+deleteButton.addEventListener("click", async function (event) {
+    event.stopPropagation();
+
+    const confirmed = confirm(
+        `Are you sure you want to delete "${blog.title}"?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+        const deleteURL = `${API_URL}/blogs/${blog._id}`;
+
+        console.log("DELETE URL:", deleteURL);
+
+        const response = await fetch(deleteURL, {
+            method: "DELETE"
+        });
+
+        console.log("DELETE status:", response.status);
+
+        const responseText = await response.text();
+        console.log("DELETE response:", responseText);
+
+        let data;
+
+        try {
+            data = JSON.parse(responseText);
+        } catch {
+            throw new Error("Server returned HTML instead of JSON.");
+        }
+
+        if (!response.ok) {
+            throw new Error(data.message || "Could not delete blog");
+        }
+
+        alert(data.message);
+        displayBlogs();
+
+    } catch (error) {
+        console.error("Delete error:", error);
+        alert(error.message || "Unable to connect to the backend.");
+    }
+});
+
+const buttonContainer = document.createElement("div");
+buttonContainer.className = "blog-actions";
+buttonContainer.append(editButton, deleteButton);
+
+card.append(title, category, content, buttonContainer);
                 blogList.appendChild(card);
             });
         } catch (error) {
@@ -243,4 +309,76 @@ if (detailTitle) {
     }
 
     loadBlogDetails();
+}
+
+// EDIT BLOG FUNCTIONALITY
+
+const editBlogForm = document.getElementById("editBlogForm");
+
+if (editBlogForm) {
+    const params = new URLSearchParams(window.location.search);
+    const blogId = params.get("id");
+
+    const titleInput = document.getElementById("editBlogTitle");
+    const categoryInput = document.getElementById("editBlogCategory");
+    const contentInput = document.getElementById("editBlogContent");
+    const message = document.getElementById("editBlogMessage");
+
+    // Load existing blog details
+    async function loadBlog() {
+        try {
+            if (!blogId) {
+                throw new Error("Blog ID is missing.");
+            }
+
+            const response = await fetch(`${API_URL}/blogs/${blogId}`);
+            const blog = await response.json();
+
+            if (!response.ok) {
+                throw new Error(blog.message || "Could not load blog.");
+            }
+
+            titleInput.value = blog.title;
+            categoryInput.value = blog.category || "General";
+            contentInput.value = blog.content;
+        } catch (error) {
+            message.textContent = error.message;
+        }
+    }
+
+    loadBlog();
+
+    // Save updated blog
+    editBlogForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        try {
+            const response = await fetch(`${API_URL}/blogs/${blogId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    title: titleInput.value.trim(),
+                    category: categoryInput.value.trim(),
+                    content: contentInput.value.trim()
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Could not update blog.");
+            }
+
+            message.textContent = "Blog updated successfully!";
+
+            setTimeout(function () {
+                window.location.href = "dashboard.html";
+            }, 1000);
+
+        } catch (error) {
+            message.textContent = error.message;
+        }
+    });
 }
