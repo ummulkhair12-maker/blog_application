@@ -395,3 +395,96 @@ footer {
         padding: 22px;
     }
 }
+/* ==================== BLOG DETAILS PAGE ==================== */
+
+.blog-details-container {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 20px;
+}
+
+.back-button {
+    display: inline-block;
+    margin-bottom: 25px;
+    padding: 10px 18px;
+    background-color: #5c4033;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #3e2a20;
+}
+
+.blog-details-card {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.blog-category {
+    display: inline-block;
+    background-color: #f1e4d6;
+    color: #6b4636;
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.blog-details-card h1 {
+    color: #35251d;
+    font-size: 36px;
+    line-height: 1.3;
+    margin: 20px 0;
+    overflow-wrap: anywhere;
+}
+
+.blog-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    color: #777777;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+.blog-details-card hr {
+    border: none;
+    border-top: 1px solid #eadfd5;
+    margin: 25px 0;
+}
+
+.blog-full-content {
+    color: #403a35;
+    font-size: 17px;
+    line-height: 1.9;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/* Mobile responsive design */
+
+@media (max-width: 600px) {
+    .blog-details-container {
+        margin: 20px auto;
+        padding: 15px;
+    }
+
+    .blog-details-card {
+        padding: 22px;
+    }
+
+    .blog-details-card h1 {
+        font-size: 28px;
+    }
+
+    .blog-full-content {
+        font-size: 16px;
+    }
+}
