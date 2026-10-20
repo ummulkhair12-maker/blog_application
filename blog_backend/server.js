@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const jwt=require("jsonwebtoken")
 require("dotenv").config();
 
 const app = express();
@@ -59,6 +60,30 @@ const blogSchema = new mongoose.Schema(
 
 const User = mongoose.model("User", userSchema);
 const Blog = mongoose.model("Blog", blogSchema);
+// ================= JWT AUTHENTICATION =================
+
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers["authorization"];
+
+    const token = authHeader && authHeader.split(" ")[1];
+
+    if (!token) {
+        return res.status(401).json({
+            message: "Access denied. Please log in."
+        });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (error, user) => {
+        if (error) {
+            return res.status(403).json({
+                message: "Invalid or expired token."
+            });
+        }
+
+        req.user = user;
+        next();
+    });
+}
 
 // ================= HOME =================
 
@@ -162,14 +187,24 @@ app.post("/api/login", async (req, res) => {
             });
         }
 
-        res.json({
-            message: "Login successful",
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email
-            }
-        });
+        const token = jwt.sign(
+    {
+        id: user._id,
+        email: user.email
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+);
+
+res.json({
+    message: "Login successful",
+    token,
+    user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+    }
+});
     } catch (error) {
         console.error("Login error:", error.message);
 
@@ -181,9 +216,11 @@ app.post("/api/login", async (req, res) => {
 
 // ================= CREATE BLOG =================
 
-app.post("/api/blogs", async (req, res) => {
+// ================= CREATE BLOG =================
+
+app.post("/api/blogs", authenticateToken, async (req, res) => {
     try {
-        const { title, content, category, authorEmail } = req.body;
+        const { title, content, category } = req.body;
 
         if (!title || !content) {
             return res.status(400).json({
@@ -191,28 +228,11 @@ app.post("/api/blogs", async (req, res) => {
             });
         }
 
-        // Temporary author lookup until proper authentication is added.
-        if (!authorEmail) {
-            return res.status(400).json({
-                message: "Author email is required"
-            });
-        }
-
-        const author = await User.findOne({
-            email: authorEmail.trim().toLowerCase()
-        });
-
-        if (!author) {
-            return res.status(401).json({
-                message: "Please log in with a registered account"
-            });
-        }
-
         const blog = await Blog.create({
             title: title.trim(),
             content: content.trim(),
             category: category || "General",
-            author: author._id
+            author: req.user.id
         });
 
         res.status(201).json({
@@ -230,9 +250,29 @@ app.post("/api/blogs", async (req, res) => {
 
 // ================= GET ALL BLOGS =================
 
+app.get("/api/blogs", authenticateToken, async (req, res) => {
+    try {
+        const blogs = await Blog.find({
+            author: req.user.id
+        })
+            .populate("author", "name")
+            .sort({ createdAt: -1 });
+
+        res.json(blogs);
+    } catch (error) {
+        console.error("Fetch blogs error:", error.message);
+
+        res.status(500).json({
+            message: "Could not retrieve blogs"
+        });
+    }
+});
+
+// ================= GET ALL BLOGS =================
+
 // ================= UPDATE BLOG =================
 
-app.put("/api/blogs/:id", async (req, res) => {
+app.put("/api/blogs/:id", authenticateToken,async (req, res) => {
     try {
         const { title, content, category } = req.body;
         const { id } = req.params;
@@ -249,18 +289,18 @@ app.put("/api/blogs/:id", async (req, res) => {
             });
         }
 
-        const blog = await Blog.findByIdAndUpdate(
-            id,
-            {
-                title: title.trim(),
-                content: content.trim(),
-                category: category || "General"
-            },
-            {
-                new: true,
-                runValidators: true
-            }
-        ).populate("author", "name");
+      const blog = await Blog.findOneAndUpdate(
+    { _id: id, author: req.user.id },
+    {
+        title: title.trim(),
+        content: content.trim(),
+        category: category || "General"
+    },
+    {
+        new: true,
+        runValidators: true
+    }
+).populate("author", "name");
 
         if (!blog) {
             return res.status(404).json({
@@ -282,7 +322,7 @@ app.put("/api/blogs/:id", async (req, res) => {
 });
 // ================= DELETE BLOG =================
 
-app.delete("/api/blogs/:id", async (req, res) => {
+app.delete("/api/blogs/:id",authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -292,7 +332,7 @@ app.delete("/api/blogs/:id", async (req, res) => {
             });
         }
 
-        const blog = await Blog.findByIdAndDelete(id);
+        const blog = await Blog.findByIdAndDelete({_id:id,author:req.user.id})
 
         if (!blog) {
             return res.status(404).json({
@@ -330,7 +370,7 @@ app.get("/api/blogs", async (req, res) => {
 
 // ================= GET SINGLE BLOG =================
 
-app.get("/api/blogs/:id", async (req, res) => {
+app.get("/api/blogs/:id",authenticateToken, async (req, res) => {
     try {
         if (!mongoose.isValidObjectId(req.params.id)) {
             return res.status(400).json({

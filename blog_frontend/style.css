@@ -578,3 +578,69 @@ footer {
         padding: 22px;
     }
 }
+
+/* USER PROFILE */
+#userProfile {
+    max-width: 450px;
+    margin: 25px auto;
+    padding: 25px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+#userProfile h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #2563eb;
+    font-size: 24px;
+}
+
+#userProfile p {
+    margin: 12px 0;
+    color: #4b5563;
+    font-size: 15px;
+    overflow-wrap: anywhere;
+}
+
+#userProfile span {
+    color: #111827;
+    font-weight: 600;
+}
+
+/* LOGOUT BUTTON */
+#logoutButton {
+    display: block;
+    margin: 15px 20px 15px auto;
+    padding: 10px 20px;
+    background: #dc2626;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+#logoutButton:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+}
+
+/* MOBILE RESPONSIVENESS */
+@media (max-width: 600px) {
+    #userProfile {
+        margin: 20px 15px;
+        padding: 20px;
+    }
+
+    #userProfile h2 {
+        font-size: 21px;
+    }
+
+    #logoutButton {
+        margin-right: 15px;
+    }
+}
