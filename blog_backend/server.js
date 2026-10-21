@@ -414,8 +414,8 @@ async function startServer() {
         console.log("MongoDB not connected yet. Set MONGODB_URI in .env.");
     }
 
-    app.listen(PORT, () => {
-        console.log(`Server running at http://localhost:${PORT}`);
+    app.listen( () => {
+        console.log(`Server running at http://localhost:5000`);
     });
 }
 

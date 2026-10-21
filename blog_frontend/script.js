@@ -1,6 +1,6 @@
 console.log("Welcome to BlogSpace");
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://blog-application-k32r.onrender.com/api";
 
 // ==================== AUTH HELPERS ====================
 
